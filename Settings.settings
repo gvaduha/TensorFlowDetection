@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TensorSharpStresser" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ModelFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">model.graph</Value>
+    </Setting>
+    <Setting Name="ImgSize" Type="System.Drawing.Size" Scope="Application">
+      <Value Profile="(Default)">1920, 1080</Value>
+    </Setting>
+    <Setting Name="StressCycles" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
