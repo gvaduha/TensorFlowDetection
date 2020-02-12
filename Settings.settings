@@ -11,5 +11,8 @@
     <Setting Name="StressCycles" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">100</Value>
     </Setting>
+    <Setting Name="Processors" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">/CPU:0,/GPU:0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

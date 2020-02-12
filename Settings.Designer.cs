@@ -49,5 +49,14 @@ namespace TensorSharpStresser {
                 return ((int)(this["StressCycles"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/CPU:0,/GPU:0")]
+        public string Processors {
+            get {
+                return ((string)(this["Processors"]));
+            }
+        }
     }
 }
