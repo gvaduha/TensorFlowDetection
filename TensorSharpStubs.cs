@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,16 +11,23 @@ namespace TensorSharpStresser
 {
     struct DetectionResult
     {
-        public Rectangle box;
-        public float score;
-        public int @class;
+        public Rectangle Box;
+        public float Score;
+        public int Class;
+    }
+
+    struct ImageProcessorResult
+    {
+        public string Uri;
+        public DateTime TimeStamp;
+        public List<DetectionResult> DetectionResults;
     }
 
     interface IImageSource
     {
-        (int width, int height, byte[] data) GetRawImage();
+        string Uri { get; }
+        Task<(int width, int height, byte[] data)> GetRawImage();
     }
-
 
 
     class ImageTensorProcessor
@@ -27,13 +36,12 @@ namespace TensorSharpStresser
         private readonly TFGraph _graph;
         private readonly TFSession _session;
         private readonly object _sessionLocker = new object();
+        private List<IImageSource> _imageSources;
 
-        private Size ImgSize { get; }
-
-        public ImageTensorProcessor(byte[] model, Size imgSize, string gpu = "/CPU:0")
+        public ImageTensorProcessor(byte[] model, IEnumerable<IImageSource> imageSources, string gpu = "/CPU:0")
         {
             _id = Guid.NewGuid();
-            ImgSize = imgSize;
+            _imageSources = imageSources.ToList();
             _graph = new TFGraph();
             using (var device = _graph.WithDevice(gpu))
             {
@@ -43,9 +51,36 @@ namespace TensorSharpStresser
             Console.WriteLine($"=> Session for {gpu} created with: {String.Join(',', _session.ListDevices().Select(x => x.Name).ToList())}");
         }
 
-        public virtual IReadOnlyCollection<DetectionResult> RunDetection(byte[] img)
+        public virtual IReadOnlyCollection<ImageProcessorResult> RunDetectionCycle()
         {
-            TFTensor tensor = TFTensor.FromBuffer(new TFShape(1, ImgSize.Height, ImgSize.Width, 3), img, 0, img.Length);
+            var results = new ConcurrentBag<ImageProcessorResult>();
+            var tasks = _imageSources.Select(async s =>
+            {
+                try
+                {
+                    (var width, var height, var img) = await s.GetRawImage();
+
+                    results.Add(new ImageProcessorResult
+                    {
+                        Uri = s.Uri,
+                        TimeStamp = DateTime.UtcNow,
+                        DetectionResults = RunDetection(width, height, img)
+                    });
+                }
+                catch (ApplicationException e)
+                {
+                    Console.WriteLine($"FAULT @{s.Uri}: {e}");
+                }
+            });
+
+            return results.ToArray();
+        }
+
+        protected virtual List<DetectionResult> RunDetection(int imgWidth, int imgHeight, byte[] img)
+        {
+            Debug.Assert(img.Length == imgWidth * imgHeight * 3);
+
+            TFTensor tensor = TFTensor.FromBuffer(new TFShape(1, imgHeight, 3), img, 0, img.Length);
 
             TFTensor[] output;
             lock (_sessionLocker)
@@ -71,14 +106,14 @@ namespace TensorSharpStresser
             {
                 for (var j = 0; j < ysize; j++)
                 {
-                    var top = (int)(boxes[i, j, 0] * ImgSize.Height);
-                    var left = (int)(boxes[i, j, 1] * ImgSize.Width);
-                    var bottom = (int)(boxes[i, j, 2] * ImgSize.Height);
-                    var right = (int)(boxes[i, j, 3] * ImgSize.Width);
+                    var top = (int)(boxes[i, j, 0] * imgHeight);
+                    var left = (int)(boxes[i, j, 1] * imgWidth);
+                    var bottom = (int)(boxes[i, j, 2] * imgHeight);
+                    var right = (int)(boxes[i, j, 3] * imgWidth);
                     float score = scores[i, j];
                     var @class = Convert.ToInt32(classes[i, j]);
 
-                    results[i * ysize + j] = new DetectionResult { box = new Rectangle(top, left, bottom, right), score = score, @class = @class };
+                    results[i * ysize + j] = new DetectionResult { Box = new Rectangle(top, left, bottom, right), Score = score, Class = @class };
                 }
             }
 
@@ -86,39 +121,18 @@ namespace TensorSharpStresser
         }
     }
 
-    class WhiteNoiceImageTensorProcessor : ImageTensorProcessor
-    {
-        private static readonly Random _rnd = new Random();
-
-        private readonly int _imgByteLen;
-        private readonly byte[] _buff;
-
-        public WhiteNoiceImageTensorProcessor(byte[] model, Size imgSize, string gpu = "/CPU:0")
-            : base(model, imgSize, gpu)
-        {
-            _imgByteLen = imgSize.Width * imgSize.Height * 3;
-            _buff = new byte[_imgByteLen];
-        }
-
-        public override IReadOnlyCollection<DetectionResult> RunDetection(byte[] img)
-        {
-            _rnd.NextBytes(_buff);
-            return base.RunDetection(_buff);
-        }
-    }
-
     class ParallelPairStresser
     {
-        private List<WhiteNoiceImageTensorProcessor> _processors;
+        private List<ImageTensorProcessor> _processors;
 
-        public ParallelPairStresser(IEnumerable<WhiteNoiceImageTensorProcessor> processors)
+        public ParallelPairStresser(IEnumerable<ImageTensorProcessor> processors)
         {
             _processors = processors.ToList();
         }
 
         public void Run(int stressCycles)
         {
-            var taskGroups = Enumerable.Range(0, stressCycles).Select(_ => _processors.Select(p => new Task(() => p.RunDetection(null))));
+            var taskGroups = Enumerable.Range(0, stressCycles).Select(_ => _processors.Select(p => new Task(() => p.RunDetectionCycle())));
             taskGroups.ToList().ForEach(group => Task.WaitAll(group.ToArray()));
         }
     }
@@ -159,7 +173,7 @@ namespace TensorSharpStresser
 
         //                Enumerable.Range(1, 1000).ToList().ForEach(i =>
         //                {
-        //                    new Random(DateTime.Now.Millisecond).NextBytes(_buff);
+        //                    new Random(DateTime.UtcNow.Millisecond).NextBytes(_buff);
         //                    TFTensor tensor = TFTensor.FromBuffer(new TFShape(1, 800, 600, 3), _buff, 0, _buff.Length);
 
         //                    TFTensor[] output;

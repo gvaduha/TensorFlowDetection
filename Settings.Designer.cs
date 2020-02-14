@@ -44,18 +44,45 @@ namespace TensorSharpStresser {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public int StressCycles {
+        public uint StressCycles {
             get {
-                return ((int)(this["StressCycles"]));
+                return ((uint)(this["StressCycles"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("/CPU:0,/GPU:0")]
-        public string Processors {
+        public string TensorProcessors {
             get {
-                return ((string)(this["Processors"]));
+                return ((string)(this["TensorProcessors"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("test.mp4")]
+        public string VideoSource {
+            get {
+                return ((string)(this["VideoSource"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int SourcesPerProcessor {
+            get {
+                return ((int)(this["SourcesPerProcessor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool WhiteNoiceSources {
+            get {
+                return ((bool)(this["WhiteNoiceSources"]));
             }
         }
     }
