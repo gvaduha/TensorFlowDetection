@@ -29,7 +29,6 @@ namespace TensorSharpStresser
         Task<(int width, int height, byte[] data)> GetRawImage();
     }
 
-
     class ImageTensorProcessor
     {
         private readonly Guid _id;
@@ -38,17 +37,30 @@ namespace TensorSharpStresser
         private readonly object _sessionLocker = new object();
         private List<IImageSource> _imageSources;
 
-        public ImageTensorProcessor(byte[] model, IEnumerable<IImageSource> imageSources, string gpu = "/CPU:0")
+        public ImageTensorProcessor(byte[] model, IEnumerable<IImageSource> imageSources, string device = "/CPU:0")
         {
             _id = Guid.NewGuid();
             _imageSources = imageSources.ToList();
+
             _graph = new TFGraph();
-            using (var device = _graph.WithDevice(gpu))
+            var options = new TFImportGraphDefOptions();
+            //options.SetDefaultDevice(device);
+            _graph.Import(model, options);
+
+            TFSessionOptions TFOptions = new TFSessionOptions();
+
+            unsafe
             {
-                _graph.Import(model);
+                byte[] GPUConfig = { 0x38, 0x1 };
+
+                fixed (void* ptr = &GPUConfig[0])
+                {
+                    TFOptions.SetConfig(new IntPtr(ptr), GPUConfig.Length);
+                }
             }
-            _session = new TFSession(_graph);
-            Console.WriteLine($"=> Session for {gpu} created with: {String.Join(',', _session.ListDevices().Select(x => x.Name).ToList())}");
+            _session = new TFSession(_graph, TFOptions);
+
+            Console.WriteLine($"=> Session for {device} created with: {String.Join(',', _session.ListDevices().Select(x => x.Name).ToList())}");
         }
 
         public virtual IReadOnlyCollection<ImageProcessorResult> RunDetectionCycle()

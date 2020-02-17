@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TensorSharpStresser
@@ -12,11 +13,13 @@ namespace TensorSharpStresser
 
         private IEnumerable<ImageTensorProcessor> _tps;
         private uint _processCycles;
+        private CancellationToken _cancellation;
 
-        public TensorProcessingService(IEnumerable<ImageTensorProcessor> tps, uint processCycles)
+        public TensorProcessingService(IEnumerable<ImageTensorProcessor> tps, uint processCycles, CancellationToken cancellation)
         {
             _processCycles = processCycles;
             _tps = tps;
+            _cancellation = cancellation;
         }
 
         public struct ServiceProcessingResult
@@ -40,6 +43,7 @@ namespace TensorSharpStresser
         {
             IEnumerable<ImageProcessorResult> RunSingleCycle()
             {
+                _cancellation.ThrowIfCancellationRequested();
                 var results = new ConcurrentBag<IEnumerable<ImageProcessorResult>>();
                 var taskPack = _tps.Select(p => new Task(() => results.Add(p.RunDetectionCycle()))).ToList();
                 Task.WaitAll(taskPack.ToArray());
