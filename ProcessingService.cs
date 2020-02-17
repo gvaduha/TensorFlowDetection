@@ -7,7 +7,25 @@ using System.Threading.Tasks;
 
 namespace TensorSharpStresser
 {
-    class TensorProcessingService
+    public struct ServiceProcessingResult
+    {
+        public Guid ServiceId { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public List<ImageProcessorResult> ImageProcessorResults { get; set; }
+    }
+
+    public interface ITensorProcessingResultSource
+    {
+        ServiceProcessingResult CurrentResult { get; }
+    }
+
+    //I'm too lazy to use DI at this point
+    public static class ServiceLocatorAntiP
+    {
+        public static ITensorProcessingResultSource TensorProcessingResultSource { get; set; }
+    }
+
+    class TensorProcessingService : ITensorProcessingResultSource
     {
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -20,13 +38,6 @@ namespace TensorSharpStresser
             _processCycles = processCycles;
             _tps = tps;
             _cancellation = cancellation;
-        }
-
-        public struct ServiceProcessingResult
-        {
-            public Guid ServiceId;
-            public DateTime TimeStamp;
-            public List<ImageProcessorResult> ImageProcessorResults;
         }
 
         public static ServiceProcessingResult UndefinedResult = new ServiceProcessingResult();

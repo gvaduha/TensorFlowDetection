@@ -14,7 +14,10 @@ namespace TensorSharpStresser
         private static void CtrlcHandler(object sender, ConsoleCancelEventArgs args)
         {
             if (ConsoleSpecialKey.ControlC == args.SpecialKey)
+            {
                 _cts.Cancel();
+                args.Cancel = true;
+            }
         }
 
         // Return ((Task * procNum) * stressCyclesNum)
@@ -37,16 +40,18 @@ namespace TensorSharpStresser
 
         static void Main(string[] args)
         {
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(CtrlcHandler);
+
             AppDomain.CurrentDomain.UnhandledException += (s, e) => Console.WriteLine("*** Crash! *** UnhandledException");
             TaskScheduler.UnobservedTaskException += (s, e) => Console.WriteLine("*** Crash! *** UnobservedTaskException");
             
             var tps = PrepareTensorProcessors();
             var aggr = new TensorProcessingService(tps, Settings.Default.StressCycles, _cts.Token);
 
+            ServiceLocatorAntiP.TensorProcessingResultSource = aggr as ITensorProcessingResultSource;
+
             var wsTask = Task.Run(() => WebServiceHostStartup.RunWebServiceHost());
             var tensorTask = Task.Run(() => aggr.Run());
-
-            Console.CancelKeyPress += new ConsoleCancelEventHandler(CtrlcHandler);
 
             Task.WaitAll(new Task[] { wsTask, tensorTask });
         }

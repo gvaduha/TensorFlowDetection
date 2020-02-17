@@ -9,14 +9,14 @@ using TensorFlow;
 
 namespace TensorSharpStresser
 {
-    struct DetectionResult
+    public struct DetectionResult
     {
         public Rectangle Box;
         public float Score;
         public int Class;
     }
 
-    struct ImageProcessorResult
+    public struct ImageProcessorResult
     {
         public string Uri;
         public DateTime TimeStamp;

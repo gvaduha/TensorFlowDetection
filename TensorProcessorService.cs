@@ -7,33 +7,36 @@ using Microsoft.Extensions.Logging;
 
 namespace TensorSharpStresser
 {
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-
-        public string Summary { get; set; }
-    }
-
     [ApiController]
     [Route("[controller]")]
     public class TensorProcessorController : ControllerBase
     {
+        //Must use DI for constructors like this
+        //private ITensorProcessingResultSource _tps;
+        //public TensorProcessorController(ITensorProcessingResultSource tps)
+        //{
+        //    _tps = tps;
+        //}
+
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public ServiceProcessingResult Get()
         {
-            var rng = new Random();
-            var ret = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = "XXX"
-            })
-            .ToArray();
-            return ret;
+            var res = ServiceLocatorAntiP.TensorProcessingResultSource.CurrentResult;
+            return res;
         }
+
+        //[HttpGet]
+        //public IEnumerable<WeatherForecast> Get()
+        //{
+        //    var rng = new Random();
+        //    var ret = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        //    {
+        //        Date = DateTime.Now.AddDays(index),
+        //        TemperatureC = rng.Next(-20, 55),
+        //        Summary = "XXX"
+        //    })
+        //    .ToArray();
+        //    return ret;
+        //}
     }
 }

@@ -34,7 +34,7 @@ namespace TensorSharpStresser {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1920, 1080")]
+        [global::System.Configuration.DefaultSettingValueAttribute("320, 200")]
         public global::System.Drawing.Size ImgSize {
             get {
                 return ((global::System.Drawing.Size)(this["ImgSize"]));
@@ -43,7 +43,7 @@ namespace TensorSharpStresser {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public uint StressCycles {
             get {
                 return ((uint)(this["StressCycles"]));

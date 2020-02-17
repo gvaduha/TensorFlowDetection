@@ -6,10 +6,10 @@
       <Value Profile="(Default)">model.graph</Value>
     </Setting>
     <Setting Name="ImgSize" Type="System.Drawing.Size" Scope="Application">
-      <Value Profile="(Default)">1920, 1080</Value>
+      <Value Profile="(Default)">320, 200</Value>
     </Setting>
     <Setting Name="StressCycles" Type="System.UInt32" Scope="Application">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="TensorProcessors" Type="System.String" Scope="Application">
       <Value Profile="(Default)">/CPU:0,/GPU:0</Value>
