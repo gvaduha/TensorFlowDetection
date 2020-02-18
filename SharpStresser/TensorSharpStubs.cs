@@ -25,9 +25,9 @@ namespace SharpStresser
 
     public struct DetectionResult
     {
-        public BBox Box { get; set; }
-        public float Score { get; set; }
         public int Class { get; set; }
+        public float Score { get; set; }
+        public BBox Box { get; set; }
     }
 
     public struct ImageProcessorResult
