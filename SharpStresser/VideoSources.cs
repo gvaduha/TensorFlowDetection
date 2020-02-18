@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 
-namespace TensorSharpStresser
+namespace SharpStresser
 {
     class VideoFileSource : IImageSource, IDisposable
     {

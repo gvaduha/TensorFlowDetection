@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TensorSharpStresser
+namespace SharpStresser
 {
     public struct ServiceProcessingResult
     {
@@ -73,9 +73,12 @@ namespace TensorSharpStresser
                     };
                     Console.Write($"[{n}]");
                 }
-                catch (Exception e)
+                catch (AggregateException ae)
                 {
-                    Console.WriteLine($"OOPS! [{n}]: {e}");
+                    if (ae.InnerExceptions[0].GetType() == typeof(TaskCanceledException))
+                        Console.WriteLine("Process canceled by user request");
+                    else
+                        Console.WriteLine($"BOOOM!: {ae}");
                 }
             }
         }

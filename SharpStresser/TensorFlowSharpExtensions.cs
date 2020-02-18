@@ -18,7 +18,7 @@
 //using TensorFlow;
 //using TF_ImportGraphDefOptions = System.IntPtr;
 
-//namespace TensorSharpStresser
+//namespace SharpStresser
 //{
 //	static partial class NativeBinding
 //	{

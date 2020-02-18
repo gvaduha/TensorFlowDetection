@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TensorSharpStresser
+namespace SharpStresser
 {
     class Program
     {
@@ -15,6 +15,7 @@ namespace TensorSharpStresser
         {
             if (ConsoleSpecialKey.ControlC == args.SpecialKey)
             {
+                Console.WriteLine("Waiting for worker tasks...");
                 _cts.Cancel();
                 args.Cancel = true;
             }
