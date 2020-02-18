@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TensorSharpStresser {
+namespace SharpStresser {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
