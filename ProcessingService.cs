@@ -61,29 +61,23 @@ namespace TensorSharpStresser
                 return results.SelectMany(x => x);
             };
 
-            try
+            for(var n=0; n<_processCycles; ++n)
             {
-                CurrentResult = new ServiceProcessingResult
+                try
                 {
-                    ServiceId = Id,
-                    TimeStamp = DateTime.UtcNow,
-                    ImageProcessorResults = RunSingleCycle().Result.ToList()
-                };
+                    CurrentResult = new ServiceProcessingResult
+                    {
+                        ServiceId = Id,
+                        TimeStamp = DateTime.UtcNow,
+                        ImageProcessorResults = RunSingleCycle().Result.ToList()
+                    };
+                    Console.Write($"[{n}]");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"OOPS! [{n}]: {e}");
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine($"OOPS!: {e}");
-            }
-
-            //var steps = Enumerable.Range(0, (int)_processCycles).Select(async x =>
-            //new
-            //{
-            //    CycleNumber = x,
-            //    Result = new ServiceProcessingResult { ServiceId = Id, TimeStamp = DateTime.UtcNow, ImageProcessorResults = (await RunSingleCycle()).ToList() }
-            //});
-
-            ////steps.ToList().ForEach(async x => CurrentResult = (await x).Result);
-            //steps.ToList().ForEach(x => CurrentResult = x.Result.Result);
         }
     }
 }

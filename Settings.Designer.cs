@@ -43,7 +43,7 @@ namespace TensorSharpStresser {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public uint StressCycles {
             get {
                 return ((uint)(this["StressCycles"]));
@@ -52,7 +52,7 @@ namespace TensorSharpStresser {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/CPU:0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/CPU:0,/GPU:0")]
         public string TensorProcessors {
             get {
                 return ((string)(this["TensorProcessors"]));
@@ -70,7 +70,7 @@ namespace TensorSharpStresser {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int SourcesPerProcessor {
             get {
                 return ((int)(this["SourcesPerProcessor"]));
