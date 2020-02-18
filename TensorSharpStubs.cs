@@ -2,25 +2,39 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using TensorFlow;
 
 namespace TensorSharpStresser
 {
+    public struct BBox
+    {
+        public int Top { get; set; }
+        public int Left { get; set; }
+        public int Bottom { get; set; }
+        public int Right { get; set; }
+        public BBox(int top, int left, int bottom, int right)
+        {
+            Top = top;
+            Left = left;
+            Bottom = bottom;
+            Right = right;
+        }
+    }
+
     public struct DetectionResult
     {
-        public Rectangle Box;
-        public float Score;
-        public int Class;
+        public BBox Box { get; set; }
+        public float Score { get; set; }
+        public int Class { get; set; }
     }
 
     public struct ImageProcessorResult
     {
-        public string Uri;
-        public DateTime TimeStamp;
-        public List<DetectionResult> DetectionResults;
+        public string Uri { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public List<DetectionResult> DetectionResults { get; set; }
     }
 
     interface IImageSource
@@ -63,7 +77,7 @@ namespace TensorSharpStresser
             Console.WriteLine($"=> Session for {device} created with: {String.Join(',', _session.ListDevices().Select(x => x.Name).ToList())}");
         }
 
-        public virtual IReadOnlyCollection<ImageProcessorResult> RunDetectionCycle()
+        public async Task<IReadOnlyCollection<ImageProcessorResult>> RunDetectionCycle()
         {
             var results = new ConcurrentBag<ImageProcessorResult>();
             var tasks = _imageSources.Select(async s =>
@@ -85,14 +99,16 @@ namespace TensorSharpStresser
                 }
             });
 
+            await Task.WhenAll(tasks.ToArray());
+
             return results.ToArray();
         }
 
-        protected virtual List<DetectionResult> RunDetection(int imgWidth, int imgHeight, byte[] img)
+        protected List<DetectionResult> RunDetection(int imgWidth, int imgHeight, byte[] img)
         {
             Debug.Assert(img.Length == imgWidth * imgHeight * 3);
 
-            TFTensor tensor = TFTensor.FromBuffer(new TFShape(1, imgHeight, 3), img, 0, img.Length);
+            TFTensor tensor = TFTensor.FromBuffer(new TFShape(1, imgWidth, imgHeight, 3), img, 0, img.Length);
 
             TFTensor[] output;
             lock (_sessionLocker)
@@ -110,9 +126,9 @@ namespace TensorSharpStresser
             var scores = (float[,])output[1].GetValue();
             var classes = (float[,])output[2].GetValue();
             var xsize = boxes.GetLength(0);
-            var ysize = boxes.GetLength(1);
+            var ysize = Math.Min(boxes.GetLength(1), 5); //HACK: too many results
 
-            var results = new List<DetectionResult>(xsize * ysize);
+            var results = new List<DetectionResult>();
 
             for (var i = 0; i < xsize; i++)
             {
@@ -125,7 +141,14 @@ namespace TensorSharpStresser
                     float score = scores[i, j];
                     var @class = Convert.ToInt32(classes[i, j]);
 
-                    results[i * ysize + j] = new DetectionResult { Box = new Rectangle(top, left, bottom, right), Score = score, Class = @class };
+                    //if (score < 0.03) break; //HACK: too many results
+
+                    results.Add(new DetectionResult
+                    {
+                        Box = new BBox(top, left, bottom, right),
+                        Score = score,
+                        Class = @class
+                    });
                 }
             }
 

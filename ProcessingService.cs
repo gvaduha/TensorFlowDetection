@@ -52,23 +52,38 @@ namespace TensorSharpStresser
 
         public void Run()
         {
-            IEnumerable<ImageProcessorResult> RunSingleCycle()
+            async Task<IEnumerable<ImageProcessorResult>> RunSingleCycle()
             {
                 _cancellation.ThrowIfCancellationRequested();
                 var results = new ConcurrentBag<IEnumerable<ImageProcessorResult>>();
-                var taskPack = _tps.Select(p => new Task(() => results.Add(p.RunDetectionCycle()))).ToList();
-                Task.WaitAll(taskPack.ToArray());
+                var taskPack = _tps.Select(async x => results.Add(await x.RunDetectionCycle()));
+                await Task.WhenAll(taskPack.ToArray());
                 return results.SelectMany(x => x);
+            };
+
+            try
+            {
+                CurrentResult = new ServiceProcessingResult
+                {
+                    ServiceId = Id,
+                    TimeStamp = DateTime.UtcNow,
+                    ImageProcessorResults = RunSingleCycle().Result.ToList()
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"OOPS!: {e}");
             }
 
-            var steps = Enumerable.Range(0, (int)_processCycles).Select(x =>
-            new
-            {
-                CycleNumber = x,
-                Result = new ServiceProcessingResult { ServiceId = Id, TimeStamp = DateTime.UtcNow, ImageProcessorResults = RunSingleCycle().ToList() }
-            });
+            //var steps = Enumerable.Range(0, (int)_processCycles).Select(async x =>
+            //new
+            //{
+            //    CycleNumber = x,
+            //    Result = new ServiceProcessingResult { ServiceId = Id, TimeStamp = DateTime.UtcNow, ImageProcessorResults = (await RunSingleCycle()).ToList() }
+            //});
 
-            steps.ToList().ForEach(x => CurrentResult = x.Result);
+            ////steps.ToList().ForEach(async x => CurrentResult = (await x).Result);
+            //steps.ToList().ForEach(x => CurrentResult = x.Result.Result);
         }
     }
 }
