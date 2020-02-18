@@ -52,16 +52,24 @@ namespace SharpStresser
 
         public void Run()
         {
+            //async Task<IEnumerable<ImageProcessorResult>> RunSingleCycle()
+            //{
+            //    _cancellation.ThrowIfCancellationRequested();
+            //    var results = new ConcurrentBag<IEnumerable<ImageProcessorResult>>();
+            //    var taskPack = _tps.Select(async x => results.Add(await x.RunDetectionCycle()));
+            //    await Task.WhenAll(taskPack.ToArray());
+            //    return results.SelectMany(x => x);
+            //};
+
             async Task<IEnumerable<ImageProcessorResult>> RunSingleCycle()
             {
                 _cancellation.ThrowIfCancellationRequested();
-                var results = new ConcurrentBag<IEnumerable<ImageProcessorResult>>();
-                var taskPack = _tps.Select(async x => results.Add(await x.RunDetectionCycle()));
-                await Task.WhenAll(taskPack.ToArray());
+                var taskPack = _tps.Select(async x => await x.RunDetectionCycle());
+                var results = await Task.WhenAll(taskPack.ToArray());
                 return results.SelectMany(x => x);
             };
 
-            for(var n=0; n<_processCycles; ++n)
+            for (var n=0; n<_processCycles; ++n)
             {
                 try
                 {
