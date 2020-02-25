@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 
-namespace SharpStresser
+namespace gvaduha.Common
 {
-    class VideoFileSource : IImageSource, IDisposable
+    public class VideoFileSource : IImageSource, IDisposable
     {
         private VideoCapture _videoCapture;
 
@@ -63,7 +63,7 @@ namespace SharpStresser
         }
     }
 
-    class WhiteNoiceImageSource : IImageSource
+    public class WhiteNoiceImageSource : IImageSource
     {
         private static readonly Random _rnd = new Random();
         private readonly Size _imgSize;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TensorFlow;
 
-namespace SharpStresser
+namespace gvaduha.Common
 {
     public struct BBox
     {
@@ -37,13 +37,13 @@ namespace SharpStresser
         public List<DetectionResult> DetectionResults { get; set; }
     }
 
-    interface IImageSource
+    public interface IImageSource
     {
         string Uri { get; }
         Task<(int width, int height, byte[] data)> GetRawImage();
     }
 
-    class ImageTensorProcessor
+    public class ImageTensorProcessor
     {
         private readonly Guid _id;
         private readonly TFGraph _graph;

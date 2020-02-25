@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using gvaduha.Common;
 
 namespace SharpStresser
 {
-    public struct ServiceProcessingResult
-    {
-        public Guid ServiceId { get; set; }
-        public DateTime TimeStamp { get; set; }
-        public List<ImageProcessorResult> ImageProcessorResults { get; set; }
-    }
-
     public interface ITensorProcessingResultSource
     {
         ServiceProcessingResult CurrentResult { get; }

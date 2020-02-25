@@ -6,8 +6,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace SharpStresser
+namespace gvaduha.Common
 {
+    public struct ServiceProcessingResult
+    {
+        public Guid ServiceId { get; set; }
+        public DateTime TimeStamp { get; set; }
+        public List<ImageProcessorResult> ImageProcessorResults { get; set; }
+    }
+
     public class ExternalTensorImageProcessor
     {
         private Uri[] _processorUris;
