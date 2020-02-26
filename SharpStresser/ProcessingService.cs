@@ -22,11 +22,11 @@ namespace SharpStresser
     {
         public Guid Id { get; } = Guid.NewGuid();
 
-        private IEnumerable<ImageTensorProcessor> _tps;
+        private IEnumerable<BatchImagesTensorProcessor> _tps;
         private uint _processCycles;
         private CancellationToken _cancellation;
 
-        public TensorProcessingService(IEnumerable<ImageTensorProcessor> tps, uint processCycles, CancellationToken cancellation)
+        public TensorProcessingService(IEnumerable<BatchImagesTensorProcessor> tps, uint processCycles, CancellationToken cancellation)
         {
             _processCycles = processCycles;
             _tps = tps;

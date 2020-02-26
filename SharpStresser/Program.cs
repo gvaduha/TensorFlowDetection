@@ -5,9 +5,49 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using gvaduha.Common;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SharpStresser
 {
+    public class WebServiceStartup
+    {
+        public WebServiceStartup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //}
+
+            //app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            //app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+    }
+
     class Program
     {
         private static CancellationTokenSource _cts = new CancellationTokenSource();
@@ -23,7 +63,7 @@ namespace SharpStresser
         }
 
         // Return ((Task * procNum) * stressCyclesNum)
-        static IReadOnlyCollection<ImageTensorProcessor> PrepareTensorProcessors()
+        static IReadOnlyCollection<BatchImagesTensorProcessor> PrepareTensorProcessors()
         {
             byte[] model = File.ReadAllBytes(Settings.Default.ModelFile);
 
@@ -35,7 +75,7 @@ namespace SharpStresser
 
             // Image tensor processors (num of TensorProcessors)
             var procUnits = Settings.Default.TensorProcessors.Split(',');
-            var imgProcessors = procUnits.Select(p => new ImageTensorProcessor(model, imgSrcpack, p));
+            var imgProcessors = procUnits.Select(p => new BatchImagesTensorProcessor(model, imgSrcpack, p));
 
             return imgProcessors.ToArray();
         }
@@ -52,7 +92,7 @@ namespace SharpStresser
 
             ServiceLocatorAntiP.TensorProcessingResultSource = aggr as ITensorProcessingResultSource;
 
-            var wsTask = Task.Run(() => WebServiceHostStartup.RunWebServiceHost());
+            var wsTask = Task.Run(() => SelfHostedWebService.RunWebServiceHost<WebServiceStartup>());
             var tensorTask = Task.Run(() => aggr.Run());
 
             Task.WaitAll(new Task[] { wsTask, tensorTask });

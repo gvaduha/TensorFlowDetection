@@ -13,9 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace gvaduha.Common
 {
-    public class WebServiceHostStartup
+    public static class SelfHostedWebService
     {
-        public static async Task RunWebServiceHost()
+        public static async Task RunWebServiceHost<T>() where T : class
         {
             //var config = new ConfigurationBuilder()
             //    //.AddCommandLine(args)
@@ -27,13 +27,16 @@ namespace gvaduha.Common
                 .UseKestrel()
                 //.UseContentRoot(System.IO.Directory.GetCurrentDirectory())
                 //.UseIISIntegration()
-                .UseStartup<WebServiceHostStartup>()
+                .UseStartup<T>()
                 .Build();
 
             await host.RunAsync();
         }
+    }
 
-        public WebServiceHostStartup(IConfiguration configuration)
+    public class DefaultWebServiceHostStartup
+    {
+        public DefaultWebServiceHostStartup(IConfiguration configuration)
         {
             Configuration = configuration;
         }

@@ -8,6 +8,12 @@ using Emgu.CV.CvEnum;
 
 namespace gvaduha.Common
 {
+    public interface IImageSource
+    {
+        string Uri { get; }
+        Task<(int width, int height, byte[] data)> GetRawImage();
+    }
+
     public class VideoFileSource : IImageSource, IDisposable
     {
         private VideoCapture _videoCapture;
