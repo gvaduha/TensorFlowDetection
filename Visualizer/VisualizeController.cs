@@ -10,15 +10,10 @@ using Microsoft.Extensions.Logging;
 namespace Visualizer.Controllers
 {
     [ApiController]
-    //[Route("[controller]")]
-    [Route("/")]
-    public class VisualizeController : ControllerBase
+    [Route("[controller]")]
+    public class FakeController : ControllerBase
     {
-        public VisualizeController()
-        {
-        }
-
-        [HttpGet("fake/{video}")]
+        [HttpGet("once/{video}")]
         public async Task<ContentResult> GetAsync(string video)
         {
             var vs = new VideoStreamSource(HttpUtility.UrlDecode(video));
@@ -28,23 +23,20 @@ namespace Visualizer.Controllers
             var c = new ContentResult
             {
                 ContentType = "text/html",
-                Content = $"<html><body><img alt='frame' src='data:image/jpeg;base64,{await painter.GetNextImageAsync()}'/></body></html>"
+                Content = $"<img alt='frame' src='data:image/jpeg;base64,{await painter.GetNextImageAsync()}'/>"
             };
             return c;
         }
 
-        //[HttpGet("shit")]
-        //public ContentResult GetShit()
-        //{
-        //    var c = new ContentResult();
-        //    c.ContentType = "text/html";
-        //    c.Content = "<html><body>Test</body></html>";
-        //    return c;
-        //}
-
-
-        // GET api/authors/RickAndMSFT
-        //[HttpGet("{alias}")]
-        //[HttpGet("syncsale")]
+        [HttpGet("{video}")]
+        public ContentResult Get(string video)
+        {
+            var c = new ContentResult
+            {
+                ContentType = "text/html",
+                Content = $"<html><body><script>setTimeout(function(){{location.reload();}},1000);</script>FUUUUU!!!!{DateTime.Now}</body></html>"
+            };
+            return c;
+        }
     }
 }

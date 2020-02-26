@@ -58,10 +58,8 @@ namespace gvaduha.Common
             {
                 try
                 {
-                    //using var frame = _videoCapture.QueryFrame();
-                    using Mat frame = new Mat();
-                    //bool gresult = _videoCapture.Grab();
-                    _videoCapture.Read(frame);
+                    using var frame = _videoCapture.QueryFrame(); //Primary way
+                    // using Mat frame = new Mat(); _videoCapture.Read(frame); //ALT
                     return frame.ToImage<Bgr, byte>();
                 }
                 catch (AccessViolationException e)
