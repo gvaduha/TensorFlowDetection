@@ -19,7 +19,7 @@ namespace gvaduha.Common
         }
         public Rectangle ToRectangle()
         {
-            return new Rectangle(Top, Left, Bottom - Top, Right - Left);
+            return new Rectangle(Left, Top, Right - Left, Bottom - Top);
         }
     }
 

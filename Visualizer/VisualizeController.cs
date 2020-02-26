@@ -10,21 +10,26 @@ using Microsoft.Extensions.Logging;
 namespace Visualizer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    //[Route("[controller]")]
+    [Route("/")]
     public class VisualizeController : ControllerBase
     {
         public VisualizeController()
         {
         }
 
-        [HttpGet("{video}")]
-        public ContentResult Get(string video)
+        [HttpGet("fake/{video}")]
+        public async Task<ContentResult> GetAsync(string video)
         {
-            var painter = new DetectedBoxPainter(HttpUtility.UrlDecode(video));
+            var vs = new VideoStreamSource(HttpUtility.UrlDecode(video));
+            var drs = new FakeDetectionResultSource(vs);
+            var painter = new DetectedBoxPainter(drs);
 
-            var c = new ContentResult();
-            c.ContentType = "text/html";
-            c.Content = $"<html><body><img alt='frame' src='data:image/jpeg;base64,{painter.GetNextImage()}'/></body></html>";
+            var c = new ContentResult
+            {
+                ContentType = "text/html",
+                Content = $"<html><body><img alt='frame' src='data:image/jpeg;base64,{await painter.GetNextImageAsync()}'/></body></html>"
+            };
             return c;
         }
 

@@ -15,7 +15,7 @@ namespace gvaduha.Common
 
         public void Run(int stressCycles)
         {
-            var taskGroups = Enumerable.Range(0, stressCycles).Select(_ => _processors.Select(p => new Task(() => p.RunDetectionCycle())));
+            var taskGroups = Enumerable.Range(0, stressCycles).Select(_ => _processors.Select(p => new Task(async () => await p.RunDetectionCycle())));
             taskGroups.ToList().ForEach(group => Task.WaitAll(group.ToArray()));
         }
     }

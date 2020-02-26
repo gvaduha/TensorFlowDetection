@@ -109,7 +109,7 @@ namespace gvaduha.Common
             {
                 try
                 {
-                    (var width, var height, var img) = await s.GetRawImage();
+                    (var width, var height, var img) = await s.GetRawImageAsync();
 
                     results.Add(new ImageProcessorResult
                     {

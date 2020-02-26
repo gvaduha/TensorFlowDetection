@@ -71,7 +71,7 @@ namespace SharpStresser
             var imgSrcpack = Enumerable.Range(0, Settings.Default.SourcesPerProcessor)
                 .Select(_ => Settings.Default.WhiteNoiceSources
                                 ? new WhiteNoiceImageSource(Settings.Default.ImgSize) as IImageSource
-                                : new VideoFileSource(Settings.Default.VideoSource));
+                                : new VideoStreamSource(Settings.Default.VideoSource));
 
             // Image tensor processors (num of TensorProcessors)
             var procUnits = Settings.Default.TensorProcessors.Split(',');

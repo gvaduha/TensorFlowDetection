@@ -5,6 +5,7 @@ using System.Linq;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
+using System.Threading.Tasks;
 
 namespace gvaduha.Common
 {
@@ -19,10 +20,11 @@ namespace gvaduha.Common
             { 4, new Bgr(Color.Yellow) },
             { 5, new Bgr(Color.Purple) },
         };
-        public static int BoxBorderWidth = 1;
+        public static int BoxBorderWidth = 2;
         public static FontFace CaptionFont = FontFace.HersheySimplex;
-        public static double CaptionFontScale = .5f;
-        public static int CaptionFontThickness = 2;
+        public static double CaptionFontScale = .4f;
+        public static int CaptionFontThickness = 1;
+        public static int CaptionFontBottomMargin = 5;
     }
 
     public class DetectedBoxPainter
@@ -53,18 +55,11 @@ namespace gvaduha.Common
         //    }
         //}
 
-        private VideoCapture _capture;
+        private IDetectionResultSource _drs;
 
-        public DetectedBoxPainter(string videoUri)
+        public DetectedBoxPainter(IDetectionResultSource drs)
         {
-            try
-            {
-                _capture = new VideoCapture(videoUri);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            _drs = drs;
         }
 
         private Bgr ComplemetaryColor(Bgr c)
@@ -82,19 +77,18 @@ namespace gvaduha.Common
             var text = $"C:{dr.Class} S:{dr.Score:#.##}";
             int baseline = 0;
             var textSize = CvInvoke.GetTextSize(text, DrawingConfig.CaptionFont, DrawingConfig.CaptionFontScale, DrawingConfig.CaptionFontThickness, ref baseline);
-            var blPoint = new Point(dr.Box.Left, dr.Box.Bottom + textSize.Height + 5);
+            var blPoint = new Point(dr.Box.Left, dr.Box.Bottom + textSize.Height + DrawingConfig.CaptionFontBottomMargin);
             image.Draw(text, blPoint, DrawingConfig.CaptionFont, DrawingConfig.CaptionFontScale, ComplemetaryColor(color), DrawingConfig.CaptionFontThickness * 2 + 1);
             image.Draw(text, blPoint, DrawingConfig.CaptionFont, DrawingConfig.CaptionFontScale, color, DrawingConfig.CaptionFontThickness);
         }
 
-        public string GetNextImage()
+        public async Task<string> GetNextImageAsync()
         {
-            IEnumerable<DetectionResult> xxx = new List<DetectionResult> { new DetectionResult { Box = new BBox(100, 100, 110, 110), Class = 1, Score = .88f } };
+            var result = await _drs.getNextResultsAsync();
 
-            var mat = _capture.QueryFrame();
-            var image = mat.ToImage<Bgr, byte>();
-            xxx.ToList().ForEach(x => DrawBox(image, x));
-            var videoframe = Convert.ToBase64String(image.ToJpegData());
+            result.detectionResults.ToList().ForEach(x => DrawBox(result.image, x));
+
+            var videoframe = Convert.ToBase64String(result.image.ToJpegData());
             return videoframe;
         }
     }
