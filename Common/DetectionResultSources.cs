@@ -26,6 +26,7 @@ namespace gvaduha.Common
         public async Task<(Image<Bgr,byte>, IReadOnlyCollection<DetectionResult>)> getNextResultsAsync()
         {
             var image = await _ims.GetImageAsync();
+            //HACK: Fake implementation
             return (image, Enumerable.Empty<DetectionResult>().ToList().AsReadOnly());
         }
     }
@@ -53,7 +54,8 @@ namespace gvaduha.Common
                     Box = new BBox(top, left, top + _rnd.Next(10, 100), left + _rnd.Next(10, 100))
                 };
             });
-            return (await _ims.GetImageAsync(), dr.ToList().AsReadOnly());
+            var img = await _ims.GetImageAsync();
+            return (img, dr.ToList().AsReadOnly());
         }
     }
 

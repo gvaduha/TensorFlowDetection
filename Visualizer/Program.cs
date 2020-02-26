@@ -25,11 +25,17 @@ namespace Visualizer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // Add session
+            services.AddDistributedMemoryCache();
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSession();
+
             //if (env.IsDevelopment())
             //{
             //    app.UseDeveloperExceptionPage();
@@ -46,6 +52,12 @@ namespace Visualizer
                 endpoints.MapControllers();
             });
         }
+    }
+
+    //HACK: "session cache"
+    public static class MySessionSigleton
+    {
+        public static Dictionary<string, DetectedBoxPainter> Cache = new Dictionary<string, DetectedBoxPainter>();
     }
 
     public class Program
