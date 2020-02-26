@@ -8,19 +8,14 @@ using TensorFlow;
 
 namespace gvaduha.Common
 {
-    public class BatchImagesTensorProcessor
+    public class TensorProcessor
     {
-        private readonly Guid _id;
         private readonly TFGraph _graph;
         private readonly TFSession _session;
         private readonly object _sessionLocker = new object();
-        private List<IImageSource> _imageSources;
 
-        public BatchImagesTensorProcessor(byte[] model, IEnumerable<IImageSource> imageSources, string device = "/CPU:0")
+        public TensorProcessor(byte[] model, string device = "/CPU:0")
         {
-            _id = Guid.NewGuid();
-            _imageSources = imageSources.ToList();
-
             _graph = new TFGraph();
             var options = new TFImportGraphDefOptionsExt();
             //options.SetDefaultDevice(device);
@@ -42,34 +37,7 @@ namespace gvaduha.Common
             Console.WriteLine($"=> Session for {device} created with: {String.Join(',', _session.ListDevices().Select(x => x.Name).ToList())}");
         }
 
-        public async Task<IReadOnlyCollection<ImageProcessorResult>> RunDetectionCycle()
-        {
-            var results = new ConcurrentBag<ImageProcessorResult>();
-            var tasks = _imageSources.Select(async s =>
-            {
-                try
-                {
-                    (var width, var height, var img) = await s.GetRawImage();
-
-                    results.Add(new ImageProcessorResult
-                    {
-                        Uri = s.Uri,
-                        TimeStamp = DateTime.UtcNow,
-                        DetectionResults = RunDetection(width, height, img)
-                    });
-                }
-                catch (ApplicationException e)
-                {
-                    Console.WriteLine($"FAULT @{s.Uri}: {e}");
-                }
-            });
-
-            await Task.WhenAll(tasks.ToArray());
-
-            return results.ToArray();
-        }
-
-        protected List<DetectionResult> RunDetection(int imgWidth, int imgHeight, byte[] img)
+        public List<DetectionResult> RunDetection(int imgWidth, int imgHeight, byte[] img)
         {
             Debug.Assert(img.Length == imgWidth * imgHeight * 3);
 
@@ -118,6 +86,47 @@ namespace gvaduha.Common
             }
 
             return results;
+        }
+    }
+
+    public class BatchImagesTensorProcessor
+    {
+        private readonly Guid _id;
+        private List<IImageSource> _imageSources;
+        private TensorProcessor _tp;
+
+        public BatchImagesTensorProcessor(IEnumerable<IImageSource> imageSources, TensorProcessor tp)
+        {
+            _id = Guid.NewGuid();
+            _imageSources = imageSources.ToList();
+            _tp = tp;
+        }
+
+        public async Task<IReadOnlyCollection<ImageProcessorResult>> RunDetectionCycle()
+        {
+            var results = new ConcurrentBag<ImageProcessorResult>();
+            var tasks = _imageSources.Select(async s =>
+            {
+                try
+                {
+                    (var width, var height, var img) = await s.GetRawImage();
+
+                    results.Add(new ImageProcessorResult
+                    {
+                        Uri = s.Uri,
+                        TimeStamp = DateTime.UtcNow,
+                        DetectionResults = _tp.RunDetection(width, height, img)
+                    });
+                }
+                catch (ApplicationException e)
+                {
+                    Console.WriteLine($"FAULT @{s.Uri}: {e}");
+                }
+            });
+
+            await Task.WhenAll(tasks.ToArray());
+
+            return results.ToArray();
         }
     }
 }

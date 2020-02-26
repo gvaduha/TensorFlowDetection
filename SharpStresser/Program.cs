@@ -75,7 +75,7 @@ namespace SharpStresser
 
             // Image tensor processors (num of TensorProcessors)
             var procUnits = Settings.Default.TensorProcessors.Split(',');
-            var imgProcessors = procUnits.Select(p => new BatchImagesTensorProcessor(model, imgSrcpack, p));
+            var imgProcessors = procUnits.Select(p => new BatchImagesTensorProcessor(imgSrcpack, new TensorProcessor(model, p)));
 
             return imgProcessors.ToArray();
         }
