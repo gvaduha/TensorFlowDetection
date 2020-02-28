@@ -54,13 +54,13 @@ namespace Visualizer.Controllers
             }
         }
 
-        [HttpGet("{video}")]
-        public ContentResult Get(string video)
+        [HttpGet("{video}/{timeout}")]
+        public ContentResult Get(string video, string timeout)
         {
             var c = new ContentResult
             {
                 ContentType = "text/html",
-                Content = $"<html><body><script>setTimeout(function(){{location.reload();}},1000);</script>{GetAsync(video).Result.Content.ToString()}</body></html>"
+                Content = $"<html><body><script>setTimeout(function(){{location.reload();}},{timeout});</script>{GetAsync(video).Result.Content.ToString()}</body></html>"
             };
             return c;
         }

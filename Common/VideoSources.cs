@@ -19,14 +19,23 @@ namespace gvaduha.Common
     public class VideoStreamSource : IImageSource, IDisposable
     {
         private VideoCapture _videoCapture;
+        private double _framesToGrab = 25;
 
         public string Uri { get; }
 
         public VideoStreamSource(string uri)
         {
             Uri = uri;
-            _videoCapture = new VideoCapture(uri);
+            _videoCapture = new VideoCapture(uri, VideoCapture.API.Any);
+            var b = _videoCapture.SetCaptureProperty(CapProp.Fps, 100);
+            var x = _videoCapture.GetCaptureProperty(CapProp.Fps);
+            _videoCapture.ImageGrabbed += ImageGrabbed;
             _videoCapture.Start();
+        }
+
+        private void ImageGrabbed(object sender, EventArgs e)
+        {
+            Console.WriteLine($"{DateTime.Now}:{_videoCapture.GetCaptureProperty(CapProp.PosFrames)}:{_videoCapture.GetCaptureProperty(CapProp.PosMsec)}:{_videoCapture.GetCaptureProperty(CapProp.PosAviRatio)}");
         }
 
         //[SecurityCritical] //not allowed for async now

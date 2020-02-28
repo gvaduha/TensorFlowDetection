@@ -12,7 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visualizer", "Visualizer\Visualizer.csproj", "{74531437-B9FE-4DBA-B6CE-D328DE7FFBF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{0991D97A-424B-4071-9DE9-DE90D53D173D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{0991D97A-424B-4071-9DE9-DE90D53D173D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capturer", "Capturer\Capturer.csproj", "{573FDE0C-C7A1-4313-BDAE-0780BB0C59DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{0991D97A-424B-4071-9DE9-DE90D53D173D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0991D97A-424B-4071-9DE9-DE90D53D173D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0991D97A-424B-4071-9DE9-DE90D53D173D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{573FDE0C-C7A1-4313-BDAE-0780BB0C59DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{573FDE0C-C7A1-4313-BDAE-0780BB0C59DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{573FDE0C-C7A1-4313-BDAE-0780BB0C59DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{573FDE0C-C7A1-4313-BDAE-0780BB0C59DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
