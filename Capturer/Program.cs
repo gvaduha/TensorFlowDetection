@@ -2,6 +2,7 @@
 using System.Drawing;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 
 namespace Capturer
 {
@@ -30,13 +31,22 @@ namespace Capturer
         private void ImageGrabbed(object sender, EventArgs e)
         {
             var framepos = _vsrc.GetCaptureProperty(CapProp.PosFrames);
-            Console.WriteLine($"{DateTime.Now.Second}=>{framepos}:{_vsrc.GetCaptureProperty(CapProp.PosMsec)}:{_vsrc.GetCaptureProperty(CapProp.PosAviRatio)}");
+            var text = $"{DateTime.Now.Second}=>F#:[{framepos}] Pos:[{_vsrc.GetCaptureProperty(CapProp.PosMsec)}] AviPos:[{_vsrc.GetCaptureProperty(CapProp.PosAviRatio):#.##########}]";
+            Console.WriteLine(text);
             if (framepos % 25 == 0)
             {
                 Console.WriteLine($"======================> writing {framepos}");
                 using var m = new Mat();
                 _vsrc.Read(m);
-                _sink.Write(m);
+                ////////////////////////////////
+                Mat resm = null;
+                {
+                    var img = m.ToImage<Bgr, byte>();
+                    img.Draw(text, new Point(10, 150), FontFace.HersheySimplex, 1, new Bgr(Color.Red), 2);
+                    resm = img.Mat;
+                }
+                ////////////////////////////////
+                _sink.Write(resm);
             }
         }
 
