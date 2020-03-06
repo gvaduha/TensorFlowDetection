@@ -10,4 +10,8 @@
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.2.0.3662" />
   </ItemGroup>
 
+  <Target Name="Test" AfterTargets="build">
+    <Copy SkipUnchangedFiles="true" SourceFiles="..\earth480x270.mp4" DestinationFolder="$(TargetDir)" />
+  </Target>
+
 </Project>

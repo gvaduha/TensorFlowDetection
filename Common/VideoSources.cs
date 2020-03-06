@@ -19,7 +19,6 @@ namespace gvaduha.Common
     public class VideoStreamSource : IImageSource, IDisposable
     {
         private VideoCapture _videoCapture;
-        private double _framesToGrab = 25;
 
         public string Uri { get; }
 

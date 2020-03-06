@@ -64,7 +64,7 @@ namespace Visualizer
     {
         public static async Task Main(string[] args)
         {
-            SelfHostedWebService.RunWebServiceHost<WebServiceStartup>().Wait();
+            await SelfHostedWebService.RunWebServiceHost<WebServiceStartup>();
         }
     }
 }

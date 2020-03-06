@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
@@ -17,9 +18,10 @@ namespace Capturer
         {
             _vsrc = new VideoCapture(videoUri);
             _vsrc.ImageGrabbed += ImageGrabbed;
-            _sink = new VideoWriter(fileUri, FourCC(codec), 1,
+            _sink = new VideoWriter(fileUri, FourCC(codec), 0.25,
                 new Size((int)_vsrc.GetCaptureProperty(CapProp.FrameWidth), (int)_vsrc.GetCaptureProperty(CapProp.FrameHeight)),
                 _vsrc.GetCaptureProperty(CapProp.Monochrome) == 0);
+            _sink.Set(VideoWriter.WriterProperty.NStripes, 1);
         }
 
         public Capture CaptureConfig(Action<VideoCapture> fun)
@@ -28,16 +30,19 @@ namespace Capturer
             return this;
         }
 
+        private uint n = 1;
+
         private void ImageGrabbed(object sender, EventArgs e)
         {
             var framepos = _vsrc.GetCaptureProperty(CapProp.PosFrames);
-            var text = $"{DateTime.Now.Second}=>F#:[{framepos}] Pos:[{_vsrc.GetCaptureProperty(CapProp.PosMsec)}] AviPos:[{_vsrc.GetCaptureProperty(CapProp.PosAviRatio):#.##########}]";
+            var text = $"#{n:####} TID:{Thread.CurrentThread.ManagedThreadId} Sec{DateTime.Now.Second}=>F#:[{framepos}] Pos:[{_vsrc.GetCaptureProperty(CapProp.PosMsec)}] AviPos:[{_vsrc.GetCaptureProperty(CapProp.PosAviRatio):#.##########}] FRAME:";
             Console.WriteLine(text);
             if (framepos % 25 == 0)
             {
                 Console.WriteLine($"======================> writing {framepos}");
                 using var m = new Mat();
                 _vsrc.Read(m);
+                if (m == null) Console.WriteLine("***************************************************");
                 ////////////////////////////////
                 Mat resm = null;
                 {
@@ -48,6 +53,7 @@ namespace Capturer
                 ////////////////////////////////
                 _sink.Write(resm);
             }
+            n++;
         }
 
         public void Start() => _vsrc.Start();
@@ -64,7 +70,7 @@ namespace Capturer
     {
         static void Main(string[] args)
         {
-            using var x = new Capture(@"C:\rusalhell.mp4", @"C:\videos\xxx.avi");
+            using var x = new Capture(@"earth480x270.mp4", @"out.avi");
             x.Start();
             Console.ReadLine();
         }
