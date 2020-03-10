@@ -16,7 +16,7 @@ namespace Capturer
         
         public Capture(string videoUri, string fileUri, string codec = "MPEG")
         {
-            _vsrc = new VideoCapture(videoUri);
+            _vsrc = new VideoCapture(videoUri, VideoCapture.API.Ffmpeg);
             _vsrc.ImageGrabbed += ImageGrabbed;
             _sink = new VideoWriter(fileUri, FourCC(codec), 0.25,
                 new Size((int)_vsrc.GetCaptureProperty(CapProp.FrameWidth), (int)_vsrc.GetCaptureProperty(CapProp.FrameHeight)),
@@ -66,13 +66,22 @@ namespace Capturer
             _sink.Dispose();
         }
     }
+
+
     class Program
     {
-        static void Main(string[] args)
+        static void RunVideoCaptureTest()
         {
             using var x = new Capture(@"earth480x270.mp4", @"out.avi");
             x.Start();
             Console.ReadLine();
+        }
+
+
+        static void Main(string[] args)
+        {
+            //ConnectionStressTestRunner.Run();
+            ConnectionStressTestRunner.RunAsync().Wait();
         }
     }
 }

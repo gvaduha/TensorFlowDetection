@@ -9,7 +9,7 @@ namespace gvaduha.Common
 {
     public interface IDetectionResultSource// : IEnumerable<DetectionResult>
     {
-        Task<(Image<Bgr, byte> image, IReadOnlyCollection<DetectionResult> detectionResults)> getNextResultsAsync();
+        Task<(Image<Bgr, byte> image, IReadOnlyCollection<DetectionResult> detectionResults)> GetNextResultsAsync();
     }
 
     public class LocalTensorDetectionResultSource : IDetectionResultSource
@@ -23,7 +23,7 @@ namespace gvaduha.Common
             _tp = tp;
         }
 
-        public async Task<(Image<Bgr,byte>, IReadOnlyCollection<DetectionResult>)> getNextResultsAsync()
+        public async Task<(Image<Bgr,byte>, IReadOnlyCollection<DetectionResult>)> GetNextResultsAsync()
         {
             var image = await _ims.GetImageAsync();
             //HACK: Fake implementation
@@ -41,7 +41,7 @@ namespace gvaduha.Common
             _ims = ims;
         }
 
-        public async Task<(Image<Bgr, byte>, IReadOnlyCollection<DetectionResult>)> getNextResultsAsync()
+        public async Task<(Image<Bgr, byte>, IReadOnlyCollection<DetectionResult>)> GetNextResultsAsync()
         {
             var dr = Enumerable.Range(0, _rnd.Next(0, 10)).Select(_ =>
             {

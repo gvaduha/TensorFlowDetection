@@ -12,7 +12,7 @@ namespace gvaduha.Common
     public static class DrawingConfig
     {
         public static Bgr DefaultClassColor = new Bgr(Color.Gray);
-        public static Dictionary<int, Bgr> DetectedClassColorMap = new Dictionary<int, Bgr>
+        public static readonly Dictionary<int, Bgr> DetectedClassColorMap = new Dictionary<int, Bgr>
         {
             { 1, new Bgr(Color.Red) },
             { 2, new Bgr(Color.Blue) },
@@ -84,7 +84,7 @@ namespace gvaduha.Common
 
         public async Task<string> GetNextImageAsync()
         {
-            var result = await _drs.getNextResultsAsync();
+            var result = await _drs.GetNextResultsAsync();
 
             result.detectionResults.ToList().ForEach(x => DrawBox(result.image, x));
 
