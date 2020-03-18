@@ -19,4 +19,23 @@ namespace SharpStresser
             return res;
         }
     }
+
+
+    [ApiController]
+    [Route("ctrl")]
+    public class DetectorServerController : ControllerBase
+    {
+        [HttpPost]
+        [Route("start")]
+        public bool Start()
+        {
+            return false;
+        }
+        [HttpPost]
+        [Route("stop")]
+        public bool Stop()
+        {
+            return false;
+        }
+    }
 }
