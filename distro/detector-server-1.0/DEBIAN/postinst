@@ -1,0 +1,4 @@
+#! /bin/sh
+systemctl enable detector-server
+systemctl start detector-server
+true

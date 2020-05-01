@@ -1,0 +1,7 @@
+Package: detector-server-1.0
+Version: 1.0
+Section: science
+Priority: optional
+Architecture: amd64
+Maintainer: gvaduha@gmail.com
+Description: Object detection server

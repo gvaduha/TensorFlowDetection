@@ -1,0 +1,14 @@
+[Unit]
+Description=Object detector service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/opt/gvaduha/detector-server-1.0/SharpStresser
+
+[Install]
+WantedBy=multi-user.target
