@@ -1,5 +1,8 @@
 # TensorFlowDetection
 
+[![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/json-iterator/go/master/LICENSE)
+[![Build Status](https://travis-ci.org/gvaduha/TensorFlowDetection.svg?branch=master)](https://travis-ci.org/gvaduha/TensorFlowDetection)
+
 Capturer - imbecile video to file capture
 SharpStresser - run video streams images on object detection graph with multi gpu, expose results of detection on web service endpoint
  Detection Results Endpoint: http://localhost:5000/TensorProcessor
