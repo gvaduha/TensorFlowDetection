@@ -8,7 +8,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9FC4AA05-0A89-4FF8-88C8-4730B0587270}"
 	ProjectSection(SolutionItems) = preProject
 		earth480x270.mp4 = earth480x270.mp4
+		LICENSE = LICENSE
 		model.graph = model.graph
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visualizer", "Visualizer\Visualizer.csproj", "{74531437-B9FE-4DBA-B6CE-D328DE7FFBF7}"
